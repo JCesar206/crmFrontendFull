@@ -1,122 +1,72 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { translations } from './translations/index.js';
+import Navbar from './components/Navbar.jsx';
+import AuthForm from './components/AuthForm.jsx';
+import ClientForm from './components/ClientForm';
+import ClientTable from './components/ClientTable';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [lang, setLang] = useState('es');
+  const [darkMode, setDarkMode] = useState(false);
+  const [token, setToken] = useState(localStorage.getItem('token') || '');
+  // CRUD States
+  const [clients, setClients] = useState(()=>{
+    const saved = localStorage.getItem('crm_clients');
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: 'Ana Gómez', email: 'ana@empresa.com', phone: '555-0192' },
+      { id: 2, name: 'Carlos Ruíz', email: 'carlos@tecnologia.org', phone: '555-8831' }
+    ];
+  });
+  const [clientName, setClientName] = useState('');
+  const [clientEmail, setClientEmail] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [editingId, setEditingId] = useState(null);
+
+  const t = translations[lang];
+
+  useEffect(()=> {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  useEffect(()=> {
+    localStorage.setItem('crm_clients', JSON.stringify(clients));
+  }, [clients]);
+
+  const handleLoginSuccess = (newToken) => {
+    setToken(newToken);
+    localStorage.setItem('token', newToken);
+  };
+
+  const handleLogout = () => {
+    setToken('');
+    localStorage.removeItem('token');
+  };
+
+  const handleSaveClient = (e) => {
+    e.preventDefault();
+    if (!clientName || !clientEmail) return;
+    if (editingId) {
+      setClients(clients.map(c => c.id === editingId ? {...c, name: clientName, email: clientEmail, phone: clientPhone} : c));
+      setEditingId(null);
+    } else {
+      setClients([...clients, { id: Date.now(), name: clientName, email: clientEmail, phone: clientPhone || 'NA' }]);
+    }
+    handleClearClientForm();
+  };
+
+  const handleClearClientForm = () => {
+    setClientName('');
+    setClientEmail('');
+    setClientPhone('');
+    setEditingId(null);
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    
   )
 }
-
-export default App
