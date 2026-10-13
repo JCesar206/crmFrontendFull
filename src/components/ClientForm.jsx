@@ -13,7 +13,7 @@ export default function ClientForm({ clientName, setClientName, clientEmail, set
 				onChange={(e)=>setClientEmail(e.target.value)} required
 				className='px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:outline-none focus:ring-indigo-500' />
 
-				<input type='number' placeholder={t.clientPhone} value={clientPhone}
+				<input type='text' placeholder={t.clientPhone} value={clientPhone}
 				onChange={(e)=>setClientPhone(e.target.value)} required
 				className='px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:outline-none focus:ring-indigo-500' />
 
